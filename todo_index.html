@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Todo app</title>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    </head>
+    <body>
+        <form action="/add_data" method="post">
+            <label for="todo">Todo</label>
+            <input type="text" id="todo" name="todo">
+            <lable for="des">Todo description</lable>
+            <input type="text" id="des" name="des">
+            <button>Add todo</button>
+            <br>
+        
+            <p>Todays todos:</p>
+            <ul id="items">
+              
+            </ul>
+            <br>
+            <br>
+            <p>Today's todos done:</p>
+            <ul id="done">
+                
+            </ul>
+        </form>
+
+        <script>
+            window.addEventListener('DOMContentLoaded',()=>{
+                axios.get('http://localhost:8000/todos')
+                .then((resp)=>{
+                    for(let i=0;i<resp.data.allUsers.length;i++){
+                        showUser(resp.data.allUsers[i])
+                    }
+                }).catch(err =>
+                console.log(err))
+
+                axios.get('http://localhost:8000/todos_done')
+                .then((resp)=>{
+                    for(let i=0;i<resp.data.allUsers.length;i++){
+                        showUser2(resp.data.allUsers[i])
+                    }
+                }).catch(err =>
+                console.log(err))
+
+            })
+
+
+            function showUser(a){
+                const parentNode=document.getElementById('items');
+                const childNode=`<li id='${a.id}'> 
+                                ${a.todo} - ${a.description}
+                                <input onclick=addToDatabase(${a.id}) type='checkbox' id='${a.id}'>
+                                <button onclick=deleteUser(${a.id})>x</button>
+                                </li>`
+
+                parentNode.innerHTML=parentNode.innerHTML+childNode;
+            }
+
+            function showUser2(a){
+                const parentNode=document.getElementById('done');
+                const childNode=`<li id='${a.id}'> 
+                                ${a.todo} - ${a.description}
+                                
+                                </li>`
+
+                parentNode.innerHTML=parentNode.innerHTML+childNode;
+            }
+
+            function addToDatabase(id){
+                axios.get(`http://localhost:8000/done/${id}`)
+
+            }
+
+            function deleteUser(id){
+                console.log(id)
+                removeFromScreen(id);
+                axios.delete(`http://localhost:8000/delete/${id}`)
+               
+            }
+
+          function removeFromScreen(id){
+            const parentNode=document.getElementById('items')
+            const li=document.getElementById(`${id}`);
+             console.log('revmoe')
+            if(li){
+                parentNode.removeChild(li);
+                console.log('if')
+            }
+            }
+        </script>
+
+    </body>
+</html>
